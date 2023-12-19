@@ -12,7 +12,7 @@ class UserLoginSerializer(serializers.Serializer):
     
     Handle the login request data"""
 
-    email = serializer.EmailField()
+    email = serializers.EmailField()
     password = serializers.CharField(min_length=8,max_length=64)
 
     def validate(self,data):
