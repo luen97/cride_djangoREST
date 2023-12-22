@@ -14,7 +14,14 @@ from cride.circles.models import Circle
 class CircleViewSet(viewsets.ModelViewSet):
     """Circle view set."""
 
-    queryset = Circle.objects.all()
     serializer_class = CircleModelSerializer
-
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        """Restric list to public-only"""
+        queryset = Circle.objects.all()
+
+        if self.action == 'list':
+            return queryset.filter(is_public=True)
+        return queryset
+    
