@@ -24,7 +24,7 @@ class CircleViewSet(mixins.CreateModelMixin,
     """Circle view set."""
 
     serializer_class = CircleModelSerializer
-    permission_classes = (IsAuthenticated,)
+    lookup_field = 'slug_name'
 
     def get_queryset(self):
         """Restric list to public-only"""
