@@ -1,11 +1,19 @@
 """Users views"""
 
 # Django REST Framework
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# Permissions
+from rest_framework.permissions import (
+    AllowAny, 
+    IsAuthenticated
+)
+from cride.users.permissions import IsAccountOwner
+
 # Serializer
+from cride.circles.serializers import CircleModelSerializer
 from cride.users.serializers import (
     UserLoginSerializer,
     UserModelSerializer,
@@ -13,11 +21,31 @@ from cride.users.serializers import (
     AccountVerificationSerializer
     )
 
-class UserViewSet(viewsets.GenericViewSet):
+# Models
+from cride.users.models import User
+from cride.circles.models import Circle
+
+class UserViewSet(mixins.RetrieveModelMixin,
+                  viewsets.GenericViewSet):
     """User view set.
     
     Handle signup, login and account verification.
     """
+
+    queryset = User.objects.filter(is_active=True,is_client=True)
+    serializer_class = UserModelSerializer
+    lookup_field = 'username'
+
+    def get_permissions(self):
+        """Assign permission based on action."""
+        if self.action in ['singup','login','verify']:
+            permissions = [AllowAny]
+        elif self.action == 'retrieve':
+            permissions = [IsAuthenticated,IsAccountOwner]
+        else:
+            permissions = [IsAuthenticated]
+
+        return [permission() for permission in permissions]
 
     @action(detail=False, methods=['post'])
     def signup(self, request):
@@ -55,3 +83,16 @@ class UserViewSet(viewsets.GenericViewSet):
          
         return Response(data, status=status.HTTP_200_OK)
 
+    def retrieve(self,request,*args,**kwargs):
+        """Add extra data to the response."""
+        response = super().retrieve(request,*args,**kwargs)
+        circles = Circle.objects.filter(
+            members=request.user,
+            membership__is_active=True
+        )
+        data = {
+            'user': response.data,
+            'circles': CircleModelSerializer(circles,many=True).data
+        }
+        response.data = data
+        return response
