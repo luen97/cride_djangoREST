@@ -14,6 +14,7 @@ from cride.users.permissions import IsAccountOwner
 
 # Serializer
 from cride.circles.serializers import CircleModelSerializer
+from cride.users.serializers.profiles import ProfileModelSerializer
 from cride.users.serializers import (
     UserLoginSerializer,
     UserModelSerializer,
@@ -26,6 +27,7 @@ from cride.users.models import User
 from cride.circles.models import Circle
 
 class UserViewSet(mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
                   viewsets.GenericViewSet):
     """User view set.
     
@@ -38,9 +40,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
 
     def get_permissions(self):
         """Assign permission based on action."""
-        if self.action in ['singup','login','verify']:
+        if self.action in ['signup','login','verify']:
             permissions = [AllowAny]
-        elif self.action == 'retrieve':
+        elif self.action in ['retrieve','update','partial_update','profile']:
             permissions = [IsAuthenticated,IsAccountOwner]
         else:
             permissions = [IsAuthenticated]
@@ -82,6 +84,25 @@ class UserViewSet(mixins.RetrieveModelMixin,
         }
          
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['put','patch'])
+    def profile(self, request,*args,**kwargs):
+        """Update profile data."""
+        user = self.get_object()
+        profile = user.profile
+        partial = request.method == 'PATCH'
+        serializer = ProfileModelSerializer(
+            profile,
+            data=request.data,
+            partial=partial
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # The user we are using here below is the
+        # one of the session with it's data updated
+        # in the serializer.save() line above
+        data = UserModelSerializer(user).data
+        return Response(data)
 
     def retrieve(self,request,*args,**kwargs):
         """Add extra data to the response."""
