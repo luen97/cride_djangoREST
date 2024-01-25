@@ -31,9 +31,10 @@ class IsSelfMember(BasePermission):
         """Let object permission grant access"""
 
         obj = view.get_object()
+        # import ipdb; ipdb.set_trace()
 
-        return self.has_object_permission(self, request, view,obj)
+        return self.has_object_permission(request, view, obj)
     
-    def has_object_permission(self, request, view,obj):
+    def has_object_permission(self, request, view, obj):
         """Allow access only if member is owned by the requesting user."""
         return request.user == obj.user
