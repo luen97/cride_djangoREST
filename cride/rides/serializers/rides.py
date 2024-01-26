@@ -14,7 +14,7 @@ class CreateRideSerializer(serializer.ModelSerializer):
     """Create ride serializer."""
 
     # CurrentUserDefault return the user given in the context
-    offered_by = serializer.HiddenField(default=CurrentUserDefault())
+    offered_by = serializer.HiddenField(default=serializer.CurrentUserDefault())
     avaliable_seats = serializer.IntegerField(min_value=1,max_value=15)
 
     class Meta:
