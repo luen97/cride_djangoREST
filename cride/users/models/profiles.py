@@ -4,10 +4,10 @@
 from django.db import models
 
 # Utilities
-from cride.utils.models import CRideModels
+from cride.utils.models import CRideModel
 
 
-class Profile(CRideModels):
+class Profile(CRideModel):
     """Profile model.
 
     A profile holds a user's public data like biography, picture, and

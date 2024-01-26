@@ -4,13 +4,13 @@
 from django.db import models
 
 # Utilities
-from cride.utils.models import CRideModels
+from cride.utils.models import CRideModel
 
 # Managers
 from cride.circles.managers import InvitationManager
 
 
-class Invitation(CRideModels):
+class Invitation(CRideModel):
     """Circle invitation.
     A circle invitation is a random text that acts as
     a unique code that grants access to a specific circle.

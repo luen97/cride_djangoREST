@@ -4,10 +4,10 @@
 from django.db import models
 
 # Utilities
-from cride.utils.models import CRideModels
+from cride.utils.models import CRideModel
 
 
-class Circle(CRideModels):
+class Circle(CRideModel):
     """Circle model.
 
     A circle is a private group where rides are offered and taken
@@ -57,6 +57,6 @@ class Circle(CRideModels):
         """Return circle name."""
         return self.name
 
-    class Meta(CRideModels.Meta):
+    class Meta(CRideModel.Meta):
         """Meta class."""
         ordering = ['-rides_taken', '-rides_offered']

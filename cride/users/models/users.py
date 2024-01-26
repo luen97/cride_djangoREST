@@ -6,10 +6,10 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
 # Utilities
-from cride.utils.models import CRideModels
+from cride.utils.models import CRideModel
 
 
-class User(CRideModels, AbstractUser):
+class User(CRideModel, AbstractUser):
     """User model.
 
     Extend form Django's Abstract User, change the username field
