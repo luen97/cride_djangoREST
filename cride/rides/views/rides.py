@@ -7,6 +7,7 @@ from rest_framework.generics import get_object_or_404
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from cride.circles.permissions import IsActiveCircleMember
+from cride.rides.permissions import IsRideOwner
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -26,10 +27,9 @@ from datetime import timedelta
 from django.utils import timezone
 
 class RideViewSet(mixins.ListModelMixin,
+                  mixins.UpdateModelMixin,
                   mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
-
-    permission_classes = [IsAuthenticated,IsActiveCircleMember]
 
     # Filters
     filter_backends = (SearchFilter,OrderingFilter)
@@ -43,6 +43,14 @@ class RideViewSet(mixins.ListModelMixin,
         self.circle = get_object_or_404(Circle,slug_name=slug_name)
         return super(RideViewSet, self).dispatch(request,*args,**kwargs)
     
+    def get_permissions(self):
+        """Assign permissions based on actions."""
+        permissions= [IsAuthenticated,IsActiveCircleMember]
+
+        if self.action in ['update','partial_update']:
+            permissions.append(IsRideOwner)
+        return [p() for p in permissions]
+
     def get_serializer_context(self):
         """Add circle to serializer context"""
         context = super(RideViewSet,self).get_serializer_context()
@@ -63,3 +71,4 @@ class RideViewSet(mixins.ListModelMixin,
             is_active=True,
             available_seats__gte=1
         )
+        
