@@ -5,7 +5,7 @@ from django.db import models
 
 # Utilities
 import random
-from string import ascii_uppercase, digits, punctuation
+from string import ascii_uppercase, digits #, punctuation
 
 
 class InvitationManager(models.Manager):
@@ -17,7 +17,7 @@ class InvitationManager(models.Manager):
 
     def create(self, **kwargs):
         """Handle code creation."""
-        pool = ascii_uppercase + digits + punctuation
+        pool = ascii_uppercase + digits + '.-' #punctuation
         code = kwargs.get('code', ''.join(random.choices(pool, k=self.CODE_LENGTH)))
         while self.filter(code=code).exists():
             code = ''.join(random.choices(pool, k=self.CODE_LENGTH))
